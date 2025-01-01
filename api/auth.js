@@ -44,7 +44,24 @@ router.post("/login", async (req, res, next) => {
 
 router.get("/me", async (req, res, next) => {
     try {
-        
+        const { username } = req.body;
+
+        const user = await prisma.user.findFirst({
+            where: {username},
+            include: {
+                reviews: true,
+                comments: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found."
+            });
+        }
+
+        res.status(200).json(user);
+
     } catch (error) {
         next(error);
     }
